@@ -1,0 +1,481 @@
+#!/usr/bin/env python3
+"""
+████████████████████████████████████████████████████████████████████████████████
+█                                                                              █
+█   ███╗   ███╗██████╗     ██╗  ██╗██╗██████╗  █████╗ ███╗   ██╗              █
+█   ████╗ ████║██╔══██╗    ██║ ██╔╝██║██╔══██╗██╔══██╗████╗  ██║              █
+█   ██╔████╔██║██████╔╝    █████╔╝ ██║██████╔╝███████║██╔██╗ ██║              █
+█   ██║╚██╔╝██║██╔══██╗    ██╔═██╗ ██║██╔══██╗██╔══██║██║╚██╗██║              █
+█   ██║ ╚═╝ ██║██║  ██║    ██║  ██╗██║██║  ██║██║  ██║██║ ╚████║              █
+█   ╚═╝     ╚═╝╚═╝  ╚═╝    ╚═╝  ╚═╝╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝              █
+█                                                                              █
+█   ███████╗███████╗    ██████╗ ███████╗ ██████╗ ██████╗ ███╗   ██╗          █
+█   ██╔════╝██╔════╝    ██╔══██╗██╔════╝██╔════╝██╔═══██╗████╗  ██║          █
+█   ███████╗█████╗      ██████╔╝█████╗  ██║     ██║   ██║██╔██╗ ██║          █
+█   ╚════██║██╔══╝      ██╔══██╗██╔══╝  ██║     ██║   ██║██║╚██╗██║          █
+█   ███████║██║         ██║  ██║███████╗╚██████╗╚██████╔╝██║ ╚████║          █
+█   ╚══════╝╚═╝         ╚═╝  ╚═╝╚══════╝ ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝          █
+█                                                                              █
+████████████████████████████████████████████████████████████████████████████████
+█                                                                              █
+█   ░▒▓█ MR KIRAN'S ELITE RECONNAISSANCE FRAMEWORK v4.0 █▓▒░                 █
+█                                                                              █
+█   ╔═══════════════════════════════════════════════════════════════════════╗ █
+█   ║                                                                       ║ █
+█   ║   ⚡ COMMANDER: MR KIRAN            ⚡ UNIT: KIRAN SPECIAL FORCES     ║ █
+█   ║   ⚡ STATUS: ELITE HACKER            ⚡ POWER: OVER 9000               ║ █
+█   ║   ⚡ MISSION: SUBDOMAIN DOMINATION    ⚡ THEME: HACKER ELITE           ║ █
+█   ║   ⚡ CLASSIFIED: TOP SECRET           ⚡ LEVEL: LEGENDARY              ║ █
+█   ║                                                                       ║ █
+█   ╚═══════════════════════════════════════════════════════════════════════╝ █
+█                                                                              █
+████████████████████████████████████████████████████████████████████████████████
+"""
+
+import requests
+import argparse
+import sys
+import json
+import time
+import random
+import re
+import os
+import signal
+import dns.resolver
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from urllib.parse import urlparse
+from datetime import datetime
+from typing import List, Dict, Set, Optional
+import urllib3
+
+# Disable SSL warnings
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+# Color setup
+class Colors:
+    RED = '\033[91m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    BLUE = '\033[94m'
+    MAGENTA = '\033[95m'
+    CYAN = '\033[96m'
+    WHITE = '\033[97m'
+    RESET = '\033[0m'
+    LIGHTRED = '\033[91m'
+    LIGHTGREEN = '\033[92m'
+    LIGHTYELLOW = '\033[93m'
+    LIGHTBLUE = '\033[94m'
+    LIGHTMAGENTA = '\033[95m'
+    LIGHTCYAN = '\033[96m'
+    BOLD = '\033[1m'
+
+# Signal handler
+def signal_handler(sig, frame):
+    print(f"\n\n{Colors.RED}╔════════════════════════════════════════════════════════════╗{Colors.RESET}")
+    print(f"{Colors.RED}║{Colors.YELLOW}  🚨 MR KIRAN DETECTED INTERRUPT - SAFE SHUTDOWN 🚨  {Colors.RED}║{Colors.RESET}")
+    print(f"{Colors.RED}╚════════════════════════════════════════════════════════════╝{Colors.RESET}")
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, signal_handler)
+
+class KiranSF:
+    """MR KIRAN'S ELITE RECONNAISSANCE FRAMEWORK"""
+    
+    BANNER = f"""
+{Colors.RED}╔═══════════════════════════════════════════════════════════════════════════════╗
+{Colors.RED}║{Colors.LIGHTRED}                                                                           {Colors.RED}║
+{Colors.RED}║{Colors.LIGHTRED}   ███╗   ███╗██████╗     ██╗  ██╗██╗██████╗  █████╗ ███╗   ██╗    {Colors.RED}║
+{Colors.RED}║{Colors.LIGHTRED}   ████╗ ████║██╔══██╗    ██║ ██╔╝██║██╔══██╗██╔══██╗████╗  ██║    {Colors.RED}║
+{Colors.RED}║{Colors.LIGHTRED}   ██╔████╔██║██████╔╝    █████╔╝ ██║██████╔╝███████║██╔██╗ ██║    {Colors.RED}║
+{Colors.RED}║{Colors.LIGHTRED}   ██║╚██╔╝██║██╔══██╗    ██╔═██╗ ██║██╔══██╗██╔══██║██║╚██╗██║    {Colors.RED}║
+{Colors.RED}║{Colors.LIGHTRED}   ██║ ╚═╝ ██║██║  ██║    ██║  ██╗██║██║  ██║██║  ██║██║ ╚████║    {Colors.RED}║
+{Colors.RED}║{Colors.LIGHTRED}   ╚═╝     ╚═╝╚═╝  ╚═╝    ╚═╝  ╚═╝╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝    {Colors.RED}║
+{Colors.RED}║{Colors.LIGHTRED}                                                                           {Colors.RED}║
+{Colors.RED}╠═══════════════════════════════════════════════════════════════════════════════╣
+{Colors.RED}║{Colors.CYAN}                                                                           {Colors.RED}║
+{Colors.RED}║{Colors.CYAN}   ░▒▓█ MR KIRAN'S ELITE RECONNAISSANCE FRAMEWORK v4.0 █▓▒░            {Colors.RED}║
+{Colors.RED}║{Colors.CYAN}                                                                           {Colors.RED}║
+{Colors.RED}╠═══════════════════════════════════════════════════════════════════════════════╣
+{Colors.RED}║{Colors.YELLOW}   ⚡ COMMANDER: MR KIRAN            ⚡ UNIT: KIRAN SPECIAL FORCES     {Colors.RED}║
+{Colors.RED}║{Colors.YELLOW}   ⚡ STATUS: ELITE HACKER            ⚡ POWER: OVER 9000               {Colors.RED}║
+{Colors.RED}║{Colors.YELLOW}   ⚡ TARGET: {{domain:<20}} ⚡ THREADS: {{threads:<4}}                 {Colors.RED}║
+{Colors.RED}║{Colors.YELLOW}   ⚡ START TIME: {{time}}                 {Colors.RED}║
+{Colors.RED}╚═══════════════════════════════════════════════════════════════════════════════╝{Colors.RESET}
+"""
+
+    # API SOURCES
+    API_SOURCES = [
+        {'name': '🏆 CRT.SH', 'func': '_query_crtsh', 'color': Colors.LIGHTGREEN},
+        {'name': '🎯 HackerTarget', 'func': '_query_hackertarget', 'color': Colors.LIGHTGREEN},
+        {'name': '👾 AlienVault', 'func': '_query_alienvault', 'color': Colors.LIGHTGREEN},
+        {'name': '🔐 CertSpotter', 'func': '_query_certspotter', 'color': Colors.LIGHTYELLOW},
+        {'name': '🌐 BufferOver', 'func': '_query_bufferover', 'color': Colors.LIGHTYELLOW},
+        {'name': '🛡️ ThreatCrowd', 'func': '_query_threatcrowd', 'color': Colors.LIGHTYELLOW},
+        {'name': '⚡ AnubisDB', 'func': '_query_anubis', 'color': Colors.LIGHTBLUE},
+        {'name': '📦 Wayback', 'func': '_query_wayback', 'color': Colors.LIGHTBLUE},
+    ]
+
+    def __init__(self, domain, threads=50, timeout=15, output_dir="mr_kiran_output"):
+        self.domain = domain.lower().strip()
+        self.threads = min(threads, 100)
+        self.timeout = timeout
+        self.output_dir = output_dir
+        self.subdomains = set()
+        self.resolved = []
+        self.alive = []
+        
+        # Create output dir
+        os.makedirs(output_dir, exist_ok=True)
+        os.makedirs(f"{output_dir}/reports", exist_ok=True)
+        
+        # User agents
+        self.user_agents = [
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15',
+            'MR KIRAN/1.0 (Elite Hacker; Reconnaissance Framework)'
+        ]
+
+    def log(self, msg, level="INFO"):
+        timestamp = datetime.now().strftime("%H:%M:%S")
+        levels = {
+            "INFO": f"{Colors.CYAN}[ℹ]{Colors.RESET}",
+            "OK": f"{Colors.GREEN}[✓]{Colors.RESET}",
+            "ERR": f"{Colors.RED}[✗]{Colors.RESET}",
+            "WARN": f"{Colors.YELLOW}[⚠]{Colors.RESET}",
+            "KIRAN": f"{Colors.LIGHTRED}[👑]{Colors.RESET}"
+        }
+        print(f"{Colors.WHITE}[{timestamp}]{Colors.RESET} {levels.get(level, levels['INFO'])} {msg}")
+
+    def headers(self):
+        return {'User-Agent': random.choice(self.user_agents)}
+
+    # ========== API METHODS ==========
+    
+    def _query_crtsh(self):
+        subs = set()
+        try:
+            url = f"https://crt.sh/?q=%25.{self.domain}&output=json"
+            r = requests.get(url, timeout=self.timeout, headers=self.headers(), verify=False)
+            if r.status_code == 200:
+                for entry in r.json():
+                    name = entry.get('name_value', '')
+                    for sub in name.split('\n'):
+                        sub = sub.lower().strip().replace('*.', '')
+                        if sub.endswith(self.domain) and sub != self.domain:
+                            subs.add(sub)
+                self.log(f"CRT.SH found {len(subs)} subs", "OK")
+        except: pass
+        return subs
+
+    def _query_hackertarget(self):
+        subs = set()
+        try:
+            url = f"https://api.hackertarget.com/hostsearch/?q={self.domain}"
+            r = requests.get(url, timeout=self.timeout, headers=self.headers(), verify=False)
+            if r.status_code == 200:
+                for line in r.text.splitlines():
+                    if ',' in line:
+                        sub = line.split(',')[0].strip().lower()
+                        if sub.endswith(self.domain) and sub != self.domain:
+                            subs.add(sub)
+                self.log(f"HackerTarget found {len(subs)} subs", "OK")
+        except: pass
+        return subs
+
+    def _query_alienvault(self):
+        subs = set()
+        try:
+            url = f"https://otx.alienvault.com/api/v1/indicators/domain/{self.domain}/passive_dns"
+            r = requests.get(url, timeout=self.timeout, headers=self.headers(), verify=False)
+            if r.status_code == 200:
+                for item in r.json().get('passive_dns', []):
+                    host = item.get('hostname', '').lower()
+                    if host.endswith(self.domain) and host != self.domain:
+                        subs.add(host)
+                self.log(f"AlienVault found {len(subs)} subs", "OK")
+        except: pass
+        return subs
+
+    def _query_certspotter(self):
+        subs = set()
+        try:
+            url = f"https://api.certspotter.com/v1/issuances?domain={self.domain}&include_subdomains=true&expand=dns_names"
+            r = requests.get(url, timeout=self.timeout, headers=self.headers(), verify=False)
+            if r.status_code == 200:
+                for cert in r.json():
+                    for name in cert.get('dns_names', []):
+                        name = name.lower().replace('*.', '')
+                        if name.endswith(self.domain) and name != self.domain:
+                            subs.add(name)
+                self.log(f"CertSpotter found {len(subs)} subs", "OK")
+        except: pass
+        return subs
+
+    def _query_bufferover(self):
+        subs = set()
+        try:
+            url = f"https://dns.bufferover.run/dns?q=.{self.domain}"
+            r = requests.get(url, timeout=self.timeout, headers=self.headers(), verify=False)
+            if r.status_code == 200:
+                for record in r.json().get('FDNS_A', []):
+                    parts = record.split(',')
+                    if len(parts) > 1:
+                        sub = parts[1].strip().lower()
+                        if sub.endswith(self.domain) and sub != self.domain:
+                            subs.add(sub)
+                self.log(f"BufferOver found {len(subs)} subs", "OK")
+        except: pass
+        return subs
+
+    def _query_threatcrowd(self):
+        subs = set()
+        try:
+            url = f"https://www.threatcrowd.org/searchApi/v2/domain/report/?domain={self.domain}"
+            r = requests.get(url, timeout=self.timeout, headers=self.headers(), verify=False)
+            if r.status_code == 200:
+                for sub in r.json().get('subdomains', []):
+                    sub = sub.lower()
+                    if sub.endswith(self.domain) and sub != self.domain:
+                        subs.add(sub)
+                self.log(f"ThreatCrowd found {len(subs)} subs", "OK")
+        except: pass
+        return subs
+
+    def _query_anubis(self):
+        subs = set()
+        try:
+            url = f"https://jldc.me/anubis/subdomains/{self.domain}"
+            r = requests.get(url, timeout=self.timeout, headers=self.headers(), verify=False)
+            if r.status_code == 200:
+                for sub in r.json():
+                    if isinstance(sub, str) and sub.endswith(self.domain) and sub != self.domain:
+                        subs.add(sub.lower())
+                self.log(f"AnubisDB found {len(subs)} subs", "OK")
+        except: pass
+        return subs
+
+    def _query_wayback(self):
+        subs = set()
+        try:
+            url = f"http://web.archive.org/cdx/search/cdx?url=*.{self.domain}&output=json&fl=original&collapse=urlkey"
+            r = requests.get(url, timeout=self.timeout, headers=self.headers(), verify=False)
+            if r.status_code == 200:
+                data = r.json()
+                for item in data[1:]:
+                    if item:
+                        parsed = urlparse(item[0])
+                        sub = parsed.netloc.lower()
+                        if sub and sub.endswith(self.domain) and sub != self.domain:
+                            subs.add(sub)
+                self.log(f"Wayback found {len(subs)} subs", "OK")
+        except: pass
+        return subs
+
+    # ========== ENUMERATION ==========
+    
+    def enumerate(self):
+        self.log(f"{Colors.LIGHTRED}MR KIRAN{Colors.RESET} starting subdomain enumeration", "KIRAN")
+        
+        print(f"\n{Colors.CYAN}╔{'═'*60}╗{Colors.RESET}")
+        print(f"{Colors.CYAN}║{Colors.LIGHTRED}  MR KIRAN'S API SOURCES {Colors.CYAN}║{Colors.RESET}")
+        print(f"{Colors.CYAN}╚{'═'*60}╝{Colors.RESET}\n")
+        
+        with ThreadPoolExecutor(max_workers=5) as executor:
+            futures = {}
+            for src in self.API_SOURCES:
+                func = getattr(self, src['func'])
+                futures[executor.submit(func)] = src['name']
+            
+            for future in as_completed(futures):
+                try:
+                    result = future.result(timeout=self.timeout+5)
+                    self.subdomains.update(result)
+                except: pass
+        
+        self.subdomains = {s for s in self.subdomains if s and len(s) < 100}
+        self.log(f"MR KIRAN discovered {Colors.GREEN}{len(self.subdomains)}{Colors.RESET} subdomains!", "OK")
+        
+        # Save
+        if self.subdomains:
+            with open(f"{self.output_dir}/subdomains.txt", 'w') as f:
+                for sub in sorted(self.subdomains):
+                    f.write(f"{sub}\n")
+
+    # ========== DNS RESOLUTION ==========
+    
+    def resolve(self):
+        if not self.subdomains:
+            return
+        
+        self.log(f"Resolving {len(self.subdomains)} subdomains", "INFO")
+        
+        def do_resolve(sub):
+            try:
+                answers = dns.resolver.resolve(sub, 'A', lifetime=self.timeout)
+                return {'sub': sub, 'ips': [str(r) for r in answers]}
+            except: return None
+        
+        with ThreadPoolExecutor(max_workers=self.threads) as ex:
+            futures = [ex.submit(do_resolve, sub) for sub in self.subdomains]
+            for f in as_completed(futures):
+                if r := f.result():
+                    self.resolved.append(r)
+        
+        self.log(f"Resolved: {len(self.resolved)}/{len(self.subdomains)}", "OK")
+        
+        with open(f"{self.output_dir}/resolved.json", 'w') as f:
+            json.dump(self.resolved, f, indent=2)
+
+    # ========== HTTP PROBING ==========
+    
+    def probe(self):
+        if not self.resolved:
+            return
+        
+        self.log(f"Probing {len(self.resolved)} targets", "INFO")
+        
+        def check(target):
+            sub = target['sub']
+            for proto in ['https', 'http']:
+                try:
+                    url = f"{proto}://{sub}"
+                    start = time.time()
+                    r = requests.get(url, timeout=5, headers=self.headers(), verify=False, allow_redirects=True)
+                    rt = round((time.time() - start) * 1000, 2)
+                    
+                    # Get title
+                    title = "No Title"
+                    if m := re.search(r'<title>(.*?)</title>', r.text, re.I|re.S):
+                        title = m.group(1).strip()[:100]
+                    
+                    return {
+                        'url': url,
+                        'status': r.status_code,
+                        'title': title,
+                        'time': rt,
+                        'ip': target['ips'][0] if target.get('ips') else 'Unknown'
+                    }
+                except: continue
+            return None
+        
+        with ThreadPoolExecutor(max_workers=self.threads) as ex:
+            futures = [ex.submit(check, t) for t in self.resolved]
+            for f in as_completed(futures):
+                if r := f.result():
+                    self.alive.append(r)
+                    
+                    # Interesting?
+                    if any(x in r['url'] for x in ['admin', 'dev', 'test', 'api', 'staging']):
+                        self.log(f"Interesting: {r['url']}", "WARN")
+        
+        self.log(f"Alive hosts: {len(self.alive)}", "OK")
+        
+        with open(f"{self.output_dir}/alive.json", 'w') as f:
+            json.dump(self.alive, f, indent=2)
+
+    # ========== REPORT ==========
+    
+    def report(self):
+        runtime = datetime.now() - self.stats['start']
+        
+        print(f"\n{Colors.GREEN}{'═'*60}{Colors.RESET}")
+        print(f"{Colors.GREEN}            MR KIRAN - MISSION COMPLETE{Colors.RESET}")
+        print(f"{Colors.GREEN}{'═'*60}{Colors.RESET}")
+        print(f"{Colors.CYAN}Target:{Colors.RESET} {self.domain}")
+        print(f"{Colors.CYAN}Runtime:{Colors.RESET} {str(runtime).split('.')[0]}")
+        print(f"{Colors.CYAN}Subdomains:{Colors.RESET} {len(self.subdomains)}")
+        print(f"{Colors.CYAN}Resolved:{Colors.RESET} {len(self.resolved)}")
+        print(f"{Colors.CYAN}Alive:{Colors.RESET} {len(self.alive)}")
+        
+        if self.alive:
+            print(f"\n{Colors.YELLOW}Top Targets:{Colors.RESET}")
+            for i, h in enumerate(self.alive[:10]):
+                color = Colors.GREEN if h['status'] < 400 else Colors.YELLOW
+                print(f"  {i+1}. {color}[{h['status']}]{Colors.RESET} {h['url']}")
+        
+        # Save report
+        report = {
+            'target': self.domain,
+            'runtime': str(runtime),
+            'stats': {
+                'subdomains': len(self.subdomains),
+                'resolved': len(self.resolved),
+                'alive': len(self.alive)
+            },
+            'alive_hosts': self.alive[:50]
+        }
+        
+        with open(f"{self.output_dir}/reports/report.json", 'w') as f:
+            json.dump(report, f, indent=2)
+        
+        print(f"\n{Colors.GREEN}[✓] Report saved to {self.output_dir}/reports/{Colors.RESET}")
+        print(f"{Colors.LIGHTRED}MR KIRAN{Colors.RESET} says: {Colors.YELLOW}\"Always hack responsibly!\"{Colors.RESET}")
+
+    # ========== RUN ==========
+    
+    def run(self):
+        self.stats = {'start': datetime.now()}
+        
+        # Show banner
+        print(self.BANNER.format(
+            domain=self.domain,
+            threads=str(self.threads),
+            time=datetime.now().strftime("%H:%M:%S")
+        ))
+        
+        self.log("MR KIRAN has entered the building", "KIRAN")
+        
+        # Phase 1
+        print(f"\n{Colors.MAGENTA}{'═'*60}{Colors.RESET}")
+        print(f"{Colors.MAGENTA}  PHASE 1: SUBDOMAIN ENUMERATION{Colors.RESET}")
+        print(f"{Colors.MAGENTA}{'═'*60}{Colors.RESET}")
+        self.enumerate()
+        
+        # Phase 2
+        if self.subdomains:
+            print(f"\n{Colors.MAGENTA}{'═'*60}{Colors.RESET}")
+            print(f"{Colors.MAGENTA}  PHASE 2: DNS RESOLUTION{Colors.RESET}")
+            print(f"{Colors.MAGENTA}{'═'*60}{Colors.RESET}")
+            self.resolve()
+        
+        # Phase 3
+        if self.resolved:
+            print(f"\n{Colors.MAGENTA}{'═'*60}{Colors.RESET}")
+            print(f"{Colors.MAGENTA}  PHASE 3: HTTP PROBING{Colors.RESET}")
+            print(f"{Colors.MAGENTA}{'═'*60}{Colors.RESET}")
+            self.probe()
+        
+        # Phase 4
+        print(f"\n{Colors.MAGENTA}{'═'*60}{Colors.RESET}")
+        print(f"{Colors.MAGENTA}  PHASE 4: GENERATING REPORT{Colors.RESET}")
+        print(f"{Colors.MAGENTA}{'═'*60}{Colors.RESET}")
+        self.report()
+        
+        print(f"\n{Colors.RED}{'═'*60}{Colors.RESET}")
+        print(f"{Colors.RED}  🏆 MISSION ACCOMPLISHED - MR KIRAN STRIKES AGAIN! 🏆{Colors.RESET}")
+        print(f"{Colors.RED}{'═'*60}{Colors.RESET}")
+
+def main():
+    parser = argparse.ArgumentParser(description='MR KIRAN - Elite Subdomain Discovery')
+    parser.add_argument('-d', '--domain', required=True, help='Target domain')
+    parser.add_argument('-t', '--threads', type=int, default=50, help='Thread count')
+    parser.add_argument('-o', '--output', default='mr_kiran_output', help='Output dir')
+    args = parser.parse_args()
+    
+    # Validate domain
+    if not re.match(r'^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$', args.domain):
+        print(f"{Colors.RED}[!] Invalid domain{Colors.RESET}")
+        sys.exit(1)
+    
+    try:
+        tool = KiranSF(args.domain, args.threads, output_dir=args.output)
+        tool.run()
+    except KeyboardInterrupt:
+        print(f"\n{Colors.RED}[!] Interrupted{Colors.RESET}")
+        sys.exit(0)
+    except Exception as e:
+        print(f"{Colors.RED}[!] Error: {e}{Colors.RESET}")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()
